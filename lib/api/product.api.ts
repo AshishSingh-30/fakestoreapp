@@ -21,12 +21,13 @@ export const getCategories = async (): Promise<string[]> => {
 
 export async function getProductById(id: string) {
   const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
-    next: {
-      revalidate: 60,
-    },
+    cache: "no-store", // ✅ IMPORTANT
   });
 
-  if (!res.ok) throw new Error("Failed to fetch product");
+  if (!res.ok) {
+    throw new Error("Failed to fetch product");
+  }
+
   return res.json();
 }
 
