@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { getProductById } from "@/lib/api/product.api";
 import { notFound } from "next/navigation";
