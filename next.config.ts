@@ -1,10 +1,15 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  /* config options here */
+const nextConfig = {
   images: {
-    domains: ["fakestoreapi.com"],
-  }
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "fakestoreapi.com",
+        pathname: "/img/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

@@ -4,8 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProducts, getCategories } from "@/lib/api/product.api";
 import ProductCard from "./ProductCard";
 import SkeletonCard from "./SkeletonCard";
-import debounce from "lodash.debounce";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { RiLayoutGridFill, RiLayoutGrid2Fill } from "react-icons/ri";
+import { useDebounce } from "@/hooks/useDebounce";
 
 type CategoryFilter = "all" | string;
 type SortType = "none" | "low-high" | "high-low";
@@ -23,7 +23,8 @@ type ViewMode = "grid-3" | "grid-5";
 
 export default function ProductList() {
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 400);
+
   const [selectedCategory, setSelectedCategory] =
     useState<CategoryFilter>("all");
   const [sort, setSort] = useState<SortType>("none");
@@ -37,11 +38,7 @@ export default function ProductList() {
       ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
       : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5";
 
-  const {
-    data: products = [],
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: products = [], isLoading, isError } = useQuery({
     queryKey: ["products"],
     queryFn: getProducts,
   });
@@ -50,20 +47,6 @@ export default function ProductList() {
     queryKey: ["categories"],
     queryFn: getCategories,
   });
-
-  const debouncedUpdate = useMemo(
-    () =>
-      debounce((value: string) => {
-        setDebouncedSearch(value);
-        setPage(1);
-      }, 400),
-    []
-  );
-
-  useEffect(() => {
-    debouncedUpdate(search);
-    return () => debouncedUpdate.cancel();
-  }, [search, debouncedUpdate]);
 
   if (isLoading) {
     return (
@@ -106,19 +89,20 @@ export default function ProductList() {
   );
 
   return (
-    <div className="w-full md:w-[95%] my-0 mx-auto p-2">
+    <div className="w-full md:w-[95%] mx-auto p-2">
       <h1 className="text-3xl font-bold">Products</h1>
-      <span className=" text-gray-500 italic my-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit repellat quasi maiores enim repudiandae alias?</span>
 
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <Input
           placeholder="Search by title..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
           className="sm:w-1/4"
         />
 
-        {/* Category Filter */}
         <Select
           value={selectedCategory}
           onValueChange={(value) => {
@@ -139,7 +123,6 @@ export default function ProductList() {
           </SelectContent>
         </Select>
 
-        {/* Sort */}
         <Select
           value={sort}
           onValueChange={(value) => {
@@ -150,7 +133,6 @@ export default function ProductList() {
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Sort By" />
           </SelectTrigger>
-
           <SelectContent>
             <SelectItem value="none">No Sorting</SelectItem>
             <SelectItem value="low-high">Price: Low → High</SelectItem>
@@ -158,7 +140,6 @@ export default function ProductList() {
           </SelectContent>
         </Select>
 
-        {/* View Toggle */}
         <div className="flex items-center gap-2 ml-auto">
           <Button
             variant={viewMode === "grid-3" ? "default" : "outline"}
