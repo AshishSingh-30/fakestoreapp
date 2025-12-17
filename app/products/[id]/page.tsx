@@ -12,9 +12,9 @@ import { ArrowLeft } from "lucide-react";
 export default async function ProductDetail({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
 
   let product;
   try {
@@ -34,29 +34,22 @@ export default async function ProductDetail({
 
       <Card>
         <CardContent className="p-6 grid md:grid-cols-2 gap-8">
-          <div className="group relative w-full h-80 bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+          <div className="relative w-full h-80 bg-muted rounded-lg overflow-hidden">
             <Image
               src={product.image}
               alt={product.title}
               fill
               priority
               sizes="(max-width: 768px) 100vw, 400px"
-              className="object-contain transition-transform duration-300 group-hover:scale-105"
+              className="object-contain"
             />
           </div>
 
-          <div className="flex flex-col">
+          <div>
             <h1 className="text-2xl font-bold">{product.title}</h1>
-
-            <p className="text-xl font-semibold text-primary mt-3">
-              ${product.price}
-            </p>
-
-            <Badge variant="secondary" className="w-fit mt-3">
-              {product.category}
-            </Badge>
-
-            <p className="mt-6 text-muted-foreground leading-relaxed">
+            <p className="text-xl font-semibold mt-3">${product.price}</p>
+            <Badge className="mt-3">{product.category}</Badge>
+            <p className="mt-6 text-muted-foreground">
               {product.description}
             </p>
           </div>
