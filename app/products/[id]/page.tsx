@@ -14,7 +14,7 @@ export default async function ProductDetail({
 }: {
   params: { id: string };
 }) {
-  const { id } = params;
+  const { id } = await params;
 
   let product;
   try {
